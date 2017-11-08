@@ -37,13 +37,13 @@ int main()
 	static double throttle = 1;
 	static int brake_iters = 0;
 	static bool brake = false;
+	const double target_speed = 50;
 
 	double Kp0 = 0.12;
 	double Ki0 = 0.00;
 	double Kd0 = 3.5;
 
 	pid.Init(Kp0, Ki0, Kd0);
-
 
 
 	h.onMessage([&pid](uWS::WebSocket<uWS::SERVER> ws, char *data, size_t length, uWS::OpCode opCode) {
@@ -71,12 +71,16 @@ int main()
 					pid.UpdateError(cte);
 					steer_value = pid.TotalError();
 
-					const double target_speed = 100;
+					/**
+					 * Increase or decrease speed based on current speed. Curretly, the model is note very stable with speeds greated than 50.
+					 *  It becomes stable at lower speeds. 50 is a nice balance between speed and oscillations.
+					 *
+					 */
 
 					if(!brake){
 						if (speed < target_speed){
-							throttle +=0.1;
-							if (throttle > 1) throttle = 1;
+							throttle +=0.3;
+							if (throttle > 1) throttle = 0.8;
 						}
 						else if (speed > target_speed) {
 							throttle = 0.5;
@@ -87,7 +91,7 @@ int main()
 						brake_iters--;
 						if (brake_iters == 0 ) {
 							brake = false;
-							throttle = 1;
+							throttle = 0.8;
 						}
 						std::cout << brake_iters << std::endl;
 					}
@@ -97,7 +101,7 @@ int main()
 
 					json msgJson;
 					msgJson["steering_angle"] = steer_value;
-					msgJson["throttle"] = 0.3;
+					msgJson["throttle"] = throttle;
 					auto msg = "42[\"steer\"," + msgJson.dump() + "]";
 					std::cout << msg << std::endl;
 					ws.send(msg.data(), msg.length(), uWS::OpCode::TEXT);
