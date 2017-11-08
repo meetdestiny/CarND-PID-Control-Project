@@ -40,3 +40,5 @@ There's an experimental patch for windows in this [PR](https://github.com/udacit
 Initial P,I,D parameters were selected based on trial and error. I had to tune the speed and throttle increments to make the driving stable. At higher throttle, the speed increases very dramatically and car starts to oscilate .As such I capped the trottle to 0.8 and used lower increments.
 
 For hyperparameters tuning, I manually ran the model for multiple PID coefficients and found a working starting point. 
+
+A video of the model is available here : [PID Model](https://www.youtube.com/watch?v=_-YFweHYPxI)
